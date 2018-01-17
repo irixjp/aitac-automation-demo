@@ -1,0 +1,7 @@
+- hosts: localhost
+  gather_facts: False
+  tasks:
+    - import_role: 
+        name: ec2_instance_delete_by_tag
+      vars:
+        ec2_instance_delete_by_tag_query: "[?tags.automation_group=='tower']"

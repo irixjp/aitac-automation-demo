@@ -1,0 +1,14 @@
+---
+# tasks file for roles/wait_server_boot
+
+- name: TEST SSH port is up?
+  wait_for:
+    host: "{{ (ansible_ssh_host | default(ansible_host)) | default(inventory_hostname) }}"
+    port: 22
+    delay: 10
+    state: started
+    timeout: 600
+  connection: local
+
+- name: Can ansible connect to targets?
+  ping:

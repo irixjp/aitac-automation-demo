@@ -1,0 +1,30 @@
+---
+# tasks file for roles/ec2_instance_create
+
+- name: create ec2 instances
+  ec2:
+    key_name: "{{ ec2_instance_create_key }}"
+    instance_type: "{{ ec2_instance_create_type }}"
+    image: "{{ ec2_instance_create_image }}"
+    wait: yes
+    group: "{{ ec2_instance_create_secg }}"
+    count: "{{ ec2_instance_create_count }}"
+    vpc_subnet_id: "{{ ec2_instance_create_vpc_id }}"
+    assign_public_ip: "{{ ec2_instance_create_assign_public_ip }}"
+    region: "{{ ec2_instance_create_region }}"
+    instance_tags: "{{ ec2_instance_create_tags }}"
+    volumes: "{{ ec2_instance_create_volumes }}"
+  register: ec2
+
+- debug: var=ec2
+
+- name: create on-memory inventory from outputs of ec2 module
+  add_host:
+    host: "{{ item.public_ip }}"
+    group: "{{ ec2_instance_create_inv_group_name }}"
+    ansible_ssh_user: centos
+    ansible_ssh_private_key_file: aitac-automation-key.pem
+  with_items: "{{ ec2.instances }}"
+
+- debug: var=hostvars
+

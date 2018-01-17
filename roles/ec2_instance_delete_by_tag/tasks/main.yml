@@ -1,0 +1,21 @@
+---
+# tasks file for roles/ec2_instance_delete_by_tag
+
+- name: gathering ec2 instance facts
+  ec2_instance_facts:
+  register: ec2
+
+- debug: var=ec2
+
+- set_fact:
+    ans_mngr_info: "{{ rt }}"
+  vars:
+    query: "{{ ec2_instance_delete_by_tag_query }}"
+    rt: "{{ ec2.instances | json_query(query) }}"
+
+- name: terminal instances
+  ec2:
+    state: 'absent'
+    instance_ids: '{{ item.instance_id }}'
+    region: "{{ ec2_instance_delete_by_tag_region }}"
+  with_items: "{{ ans_mngr_info }}"
