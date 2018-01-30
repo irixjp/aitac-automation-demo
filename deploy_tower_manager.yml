@@ -9,6 +9,12 @@
             Name: tower
             automation_group: tower
         ec2_instance_create_inv_group_name: tower-manager
+        ec2_instance_create_type: m4.large
+        ec2_instance_create_volumes:
+          - device_name: /dev/sda1
+            volume_type: gp2
+            volume_size: 100
+            delete_on_termination: true
 
 - hosts: tower-manager
   gather_facts: False
@@ -20,3 +26,6 @@
   become: yes
   tasks:
     - import_role: name=set_fast_repo
+    - import_role: name=ansible_tower_setup
+      vars:
+        ansible_tower_setup_password: redhat1234tower

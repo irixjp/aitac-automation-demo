@@ -1,0 +1,40 @@
+---
+# tasks file for roles/ansible_tower_setup
+
+- name: get tower bundle installer
+  get_url:
+    url: http://releases.ansible.com/ansible-tower/setup/ansible-tower-setup-latest.tar.gz
+    dest: /tmp/ansible-tower-setup-latest.tar.gz
+
+- name: Extract tgz into /root
+  unarchive:
+    src: /tmp/ansible-tower-setup-latest.tar.gz
+    dest: /root/
+    remote_src: yes
+
+- shell: /bin/ls /root/ | grep ansible
+  register: dir_path
+  ignore_errors: True
+  changed_when: False
+
+- set_fact:
+    tower_dir: "{{ dir_path.stdout_lines[0] }}"
+
+- debug: var=tower_dir
+
+- template:
+    src: inventory.j2
+    dest: "/root/{{ tower_dir }}/inventory"
+  vars:
+    password: "{{ ansible_tower_setup_password }}"
+    
+- shell: ./setup.sh
+  args:
+    chdir: "/root/{{ tower_dir }}"
+  register: result
+  ignore_errors: True
+
+- name: write result to file
+  template:
+    src: result.log.j2
+    dest: "/tmp/ansible-setup-log.txt"

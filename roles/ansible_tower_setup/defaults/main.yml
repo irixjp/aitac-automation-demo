@@ -1,0 +1,4 @@
+---
+# defaults file for roles/ansible_tower_setup
+
+ansible_tower_setup_password: password
